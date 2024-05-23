@@ -2,7 +2,6 @@ let jobTitles = null
 let timeoutTracker = null
 let scrollWindow = null
 let companyData = null
-let jobNameParsed = []
 let jobSet = new Set()
 let h1bSponsorships = {
     
@@ -24,7 +23,6 @@ function removeCorporationSuffix(inputString) {
 };
 
 function getJobTitles(jobTitles) {
-    jobNameParsed = []
     jobSet = new Set()
     for (let i = 0; i < jobTitles.length; i++) {
         if (jobSet.has(jobTitles[i].innerText)) {
@@ -32,8 +30,7 @@ function getJobTitles(jobTitles) {
         }
         jobSet.add(jobTitles[i].innerText)
         let parsedCompany = removeCorporationSuffix(jobTitles[i].innerText.split('·')[0])
-        jobNameParsed.push(parsedCompany)
-        h1bSponsorships[parsedCompany] = companyH1BSponsorships(removeCorporationSuffix(parsedCompany))
+        h1bSponsorships[jobTitles[i].innerText] = companyH1BSponsorships(removeCorporationSuffix(parsedCompany))
     }
     // console.log(h1bSponsorships, jobNameParsed)
 }
@@ -226,14 +223,14 @@ ensureTableContainerExists();
 
 function attachCompanySponsorChipandTableView(){
     try{
-        dismissButtons = document.querySelectorAll('[aria-label="Dismiss job"]');
-        for (let i = 0; i < jobNameParsed.length; i++) {
-            const jobData = h1bSponsorships[jobNameParsed[i]];
-            if (jobData.length > 0 && !jobTitles[i].querySelector('.company-sponsor-chip')) {
-                jobTitles[i].appendChild(chip(true));
-                dismissButtons[i].parentNode.style = 'display: flex; justify-content: space-between; align-items: center;';
-                dismissButtons[i].parentNode.insertBefore(displayTableTab(jobData), dismissButtons[i]);
-            } else if (!jobTitles[i].querySelector('.company-sponsor-chip')) {
+        dismissButtons = document.querySelectorAll('.job-card-container__primary-description');
+        for (let i = 0; i < dismissButtons.length; i++) {
+            const jobData = h1bSponsorships[dismissButtons[i].innerText];
+            console.log("DismissBtn",dismissButtons[i].innerText,"h1b",h1bSponsorships,"jobdata",jobData)
+            if (jobData.length > 0 && !jobTitles[i].parentNode.querySelector('.company-sponsor-chip')) {
+                jobTitles[i].parentNode.appendChild(chip(true));
+                dismissButtons[i].parentNode.appendChild(displayTableTab(jobData));
+            } else if (!jobTitles[i].parentNode.querySelector('.company-sponsor-chip')) {
                 jobTitles[i].appendChild(chip(false));
             }
         }
